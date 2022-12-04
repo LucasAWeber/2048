@@ -11,13 +11,19 @@ void newNumber(int [LENGTH][LENGTH], int [LENGTH*LENGTH][2], int);
 int checkValid(int [LENGTH][LENGTH], int [LENGTH*LENGTH][2]);
 int getTotal(int [LENGTH][LENGTH]);
 void logic(int [LENGTH][LENGTH]);
-void upArrow(int [LENGTH][LENGTH]);
+int upArrow(int [LENGTH][LENGTH]);
+int downArrow(int [LENGTH][LENGTH]);
+int leftArrow(int [LENGTH][LENGTH]);
+int rightArrow(int [LENGTH][LENGTH]);
+void cloneArray(int [LENGTH][LENGTH], int [LENGTH][LENGTH]);
 
 int main () {
-    int board[4][4];
+    int board[LENGTH][LENGTH];
+    int clone[LENGTH][LENGTH];
     int validBoard[LENGTH*LENGTH][2];
     int total = 0;
     int index = -1;
+    int valid = 0;
 
     srand(time(NULL));
     fillBoard(board);
@@ -29,12 +35,20 @@ int main () {
     printBoard(board);
     while (1) {
         logic(board);
+        index = checkValid(board, validBoard);
         newNumber(board, validBoard, index);
         printBoard(board);
         total = getTotal(board);
-        index = checkValid(board, validBoard);
-        // fix the win con bc you might be able to move still
-        if (index == -1) {
+        cloneArray(board, clone);
+        valid = 0;
+        valid += upArrow(clone);
+        cloneArray(board, clone);
+        valid += downArrow(clone);
+        cloneArray(board, clone);
+        valid += leftArrow(clone);
+        cloneArray(board, clone);
+        valid += rightArrow(clone);
+        if (!valid) {
             printf("Oh no you lost! You finished with a score of %d\n", total);
             break;
         }
@@ -113,32 +127,145 @@ void logic(int board[LENGTH][LENGTH]) {
             switch(getchar()) {
                 case 'A':
                     // code for arrow up
-                    upArrow(board);
-                    input = 1;
+                    if (upArrow(board)) {
+                        input = 1;
+                    }
                     break;
                 case 'B':
                     // code for arrow down
-                    input = 1;
+                    if (downArrow(board)) {
+                        input = 1;
+                    }
                     break;
                 case 'C':
                     // code for arrow right
-                    input = 1;
+                    if (rightArrow(board)) {
+                        input = 1;
+                    }
                     break;
                 case 'D':
                     // code for arrow left
-                    input = 1;
+                    if (leftArrow(board)) {
+                        input = 1;
+                    }
                     break;
             }
         }
     }
 }
 
-void upArrow(int board[LENGTH][LENGTH]) {
+int upArrow(int board[LENGTH][LENGTH]) {
+    int change = 0;
     for (int j = 0; j < LENGTH; j++) {
-        for (int i = 0; i < LENGTH-1; i++) {
-            if (board[i][j] == board[i+1][j]) {
-                
+        for (int k = 0; k < LENGTH; k++) {
+            for (int i = LENGTH-1; i > 0; i--) {
+                if (board[i-1][j] == 0 && board[i][j] != 0) {
+                    change = 1;
+                    board[i-1][j] = board[i][j];
+                    board[i][j] = 0;
+                }
             }
+        }
+        for (int i = 0; i < LENGTH-1; i++) {
+            if (board[i][j] != 0 && board[i][j] == board[i+1][j]) {
+                change = 1;
+                board[i][j] += board[i+1][j];
+                board[i+1][j] = 0;
+                for (int k = i+1; k < LENGTH-1; k++) {
+                    board[k][j] = board[k+1][j];
+                    board[k+1][j] = 0;
+                }
+            }
+        }
+    }
+    return change;
+}
+
+int downArrow(int board[LENGTH][LENGTH]) {
+    int change = 0;
+    for (int j = 0; j < LENGTH; j++) {
+        for (int k = 0; k < LENGTH; k++) {
+            for (int i = 0; i < LENGTH-1; i++) {
+                if (board[i+1][j] == 0 && board[i][j] != 0) {
+                    change = 1;
+                    board[i+1][j] = board[i][j];
+                    board[i][j] = 0;
+                }
+            }
+        }
+        for (int i = LENGTH-1; i > 0; i--) {
+            if (board[i][j] != 0 && board[i][j] == board[i-1][j]) {
+                change = 1;
+                board[i][j] += board[i-1][j];
+                board[i-1][j] = 0;
+                for (int k = i-1; k > 1; k--) {
+                    board[k][j] = board[k-1][j];
+                    board[k-1][j] = 0;
+                }
+            }
+        }
+    }
+    return change;
+}
+
+int leftArrow(int board[LENGTH][LENGTH]) {
+    int change = 0;
+    for (int i = 0; i < LENGTH; i++) {
+        for (int k = 0; k < LENGTH; k++) {
+            for (int j = LENGTH-1; j > 0; j--) {
+                if (board[i][j-1] == 0 && board[i][j] != 0) {
+                    change = 1;
+                    board[i][j-1] = board[i][j];
+                    board[i][j] = 0;
+                }
+            }
+        }
+        for (int j = 0; j < LENGTH-1; j++) {
+            if (board[i][j] != 0 && board[i][j] == board[i][j+1]) {
+                change = 1;
+                board[i][j] += board[i][j+1];
+                board[i][j+1] = 0;
+                for (int k = j+1; k < LENGTH-1; k++) {
+                    board[i][k] = board[i][k+1];
+                    board[i][k+1] = 0;
+                }
+            }
+        }
+    }
+    return change;
+}
+
+int rightArrow(int board[LENGTH][LENGTH]) {
+    int change = 0;
+    for (int i = 0; i < LENGTH; i++) {
+        for (int k = 0; k < LENGTH; k++) {
+            for (int j = 0; j < LENGTH-1; j++) {
+                if (board[i][j+1] == 0 && board[i][j] != 0) {
+                    change = 1;
+                    board[i][j+1] = board[i][j];
+                    board[i][j] = 0;
+                }
+            }
+        }
+        for (int j = LENGTH-1; j > 0; j--) {
+            if (board[i][j] != 0 && board[i][j] == board[i][j-1]) {
+                change = 1;
+                board[i][j] += board[i][j-1];
+                board[i][j-1] = 0;
+                for (int k = j-1; k > 1; k--) {
+                    board[i][k] = board[i][k-1];
+                    board[i][k-1] = 0;
+                }
+            }
+        }
+    }
+    return change;
+}
+
+void cloneArray(int board[LENGTH][LENGTH], int clone[LENGTH][LENGTH]) {
+    for (int i = 0; i < LENGTH; i++) {
+        for (int j = 0; j < LENGTH; j++) {
+            clone[i][j] = board[i][j];
         }
     }
 }
