@@ -57,23 +57,32 @@ int main () {
 }
 
 void printBoard(int board[LENGTH][LENGTH]) {
-    printf(" ");
-    for (int i = 0; i < LENGTH*2+1; i++) {
-        printf("-");
-    }
+    int digits = 0;
+    int temp = 0;
+    int total = 7;
     printf("\n");
     for (int i = 0; i < LENGTH; i++) {
-        printf("| ");
         for (int j = 0; j < LENGTH; j++) {
-            printf("%d ", board[i][j]);
+            temp = board[i][j];
+            digits = 1;
+            while (temp >= 10) {
+                temp /= 10;
+                digits++;
+            }
+            total = 7;
+            total -= digits;
+            for (int k = 0; k < total/2; k++) {
+                printf(" ");
+            }
+            printf("%d", board[i][j]);
+            total -= total/2;
+            for (int k = 0; k < total; k++) {
+                printf(" ");
+            }
         }
-        printf("|\n");
+        printf("\n");
     }
-    printf(" ");
-    for (int i = 0; i < LENGTH*2+1; i++) {
-        printf("-");
-    }
-    printf("\n\n");
+    printf("\n");
 }
 
 void fillBoard(int board[LENGTH][LENGTH]) {
